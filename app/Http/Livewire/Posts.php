@@ -8,51 +8,34 @@ use App\Models\Post;
 class Posts extends Component
 {
     public $posts, $title, $body, $post_id;
+    public $deleteId = null;
     public $updateMode = false;
 
     public function render()
     {
-
         $this->posts = Post::all();
         return view('livewire.posts');
     }
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-
-     private function resetInputFields(){
+    private function resetInputFields()
+    {
         $this->title = '';
         $this->body = '';
     }
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    
     public function store()
     {
-        $validateDate = $this->validate([
-            'title'=> 'required',
+        $validatedData = $this->validate([
+            'title' => 'required',
             'body' => 'required',
         ]);
 
-        Post::create($validateDate);
+        Post::create($validatedData);
 
-        session()->flash('message', 'Post Created Successfully');
+        session()->flash('message', 'Post Created Successfully.');
 
         $this->resetInputFields();
-
     }
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
 
     public function edit($id)
     {
@@ -63,11 +46,6 @@ class Posts extends Component
 
         $this->updateMode = true;
     }
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
 
     public function cancel()
     {
@@ -75,52 +53,39 @@ class Posts extends Component
         $this->resetInputFields();
     }
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-
     public function update()
     {
-        $validateDate = $this->validate([
-            'title'=>'required',
-            'body'=>'required',
+        $validatedData = $this->validate([
+            'title' => 'required',
+            'body' => 'required',
         ]);
 
         $post = Post::find($this->post_id);
         $post->update([
-            'title'=>$this->title,
-            'body'=>$this->body,
+            'title' => $this->title,
+            'body' => $this->body,
         ]);
 
         $this->updateMode = false;
 
-        session()->flash('message', 'Post Updated Successfully');
+        session()->flash('message', 'Post Updated Successfully.');
         $this->resetInputFields();
     }
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-
-
-    public function delete($id)
+    public function deleteId($id)
     {
-        Post::find($id)->delete();
-        session()->flash('message', 'Post Deleted Successfully');
-     }
-    
+        $this->deleteId = $id;
+    }
 
-
-
-
-
-
-
-
-    
-
+    public function delete()
+    {
+        if ($this->deleteId) {
+            $post = Post::find($this->deleteId);
+            if ($post) {
+                $post->delete();
+                session()->flash('message', 'Post Deleted Successfully.');
+            }
+        }
+        $this->deleteId = null;
+    }
 }
